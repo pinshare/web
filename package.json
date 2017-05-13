@@ -4,6 +4,7 @@
   "description": "Web implementation",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint -c ./.eslintrc.json --ignore-pattern 'node_modules' .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,5 +24,8 @@
     "github": "^9.2.0",
     "grpc": "^1.3.2",
     "spec": "https://github.com/pinshare/spec.git"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0"
   }
 }

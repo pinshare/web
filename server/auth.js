@@ -1,3 +1,5 @@
+'use strict';
+
 const url = require('url');
 const crypto = require('crypto');
 const querystring = require('querystring');
@@ -11,14 +13,35 @@ const GITHUB_AUTHORIZE_URL = 'https://github.com/login/oauth/authorize';
 const GITHUB_ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token';
 const GITHUB_API_USER_URL = 'https://api.github.com/user';
 
-module.exports = class Auth {
+/**
+ * User authentication class
+ *
+ * @class Auth
+ * @author Yoshiaki Sugimoto <sugimoto@wnotes.net>
+ */
+class Auth {
 
+  /**
+   * Bind route
+   *
+   * @static
+   * @param {Object} app express app
+   * @return {Void} -
+   */
   static bind(app) {
     const auth = new Auth();
     app.get('/auth', auth.handleAuth.bind(auth));
     app.get('/auth/callback', auth.handleCallback.bind(auth));
   }
 
+  /**
+   * Auth init handler
+   *
+   * @route /auth
+   * @param {Object} req express request
+   * @param {Object} res express response
+   * @return {Void} -
+   */
   handleAuth(req, res) {
     const urlObj = url.parse(GITHUB_AUTHORIZE_URL);
     /* eslint-disable camelcase */
@@ -32,6 +55,14 @@ module.exports = class Auth {
     res.redirect(urlObj.format());
   }
 
+  /**
+   * Auth callback handler
+   *
+   * @route /auth/callback
+   * @param {Object} req express request
+   * @param {Object} res express response
+   * @return {Void} -
+   */
   handleCallback(req, res) {
     /* eslint-disable camelcase */
     const query = {
@@ -51,7 +82,7 @@ module.exports = class Auth {
           'User-Agent': req.headers['user-agent']
         });
       })
-      .then(user => service.authenticate(user))
+      .then(user => service.authenticate(JSON.parse(user)))
       .then(token => {
         res.cookie('pstoken', token, {
           maxAge: 60 * 60 * 24 * 30,
@@ -66,6 +97,14 @@ module.exports = class Auth {
     ;
   }
 
+  /**
+   * Send Github auth/api request
+   *
+   * @param {String} method request method
+   * @param {string} requestUrl request URL
+   * @param {Object} headers custom headers
+   * @return {Promise} -
+   */
   sendRequest(method, requestUrl, headers = {}) {
     const urlObj = url.parse(requestUrl);
     const options = {
@@ -91,3 +130,5 @@ module.exports = class Auth {
     });
   }
 }
+
+module.exports = Auth;

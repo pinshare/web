@@ -10,6 +10,7 @@ app.engine('.html', expressHandlebars({
   partialsDir: 'view/_partial'
 }));
 app.set('view engine', '.html');
+app.set('views', 'view');
 
 auth.bind(app);
 
